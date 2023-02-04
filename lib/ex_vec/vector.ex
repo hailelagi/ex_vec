@@ -2,6 +2,8 @@ defmodule ExVec.Vector do
   @moduledoc """
     elixir wrapper for std::vec::Vec<T, A>
   """
+  use Rustler, otp_app: :ex_vec, crate: "exvec_vector"
+
   @behaviour Access
 
   defimpl Enumerable, for: ExVec.Array do
@@ -14,7 +16,9 @@ defmodule ExVec.Vector do
   end
 
   @impl Access
-  def new(args), do: args
+  def new(args) do
+    # todo: how to deal with variadic functions in rust again?
+  end
 
   @impl Access
   def fetch(term, key) do
@@ -30,4 +34,6 @@ defmodule ExVec.Vector do
   def pop(data, key) do
     nil
   end
+
+  def error, do: :erlang.nif_error(:nif_not_loaded)
 end
