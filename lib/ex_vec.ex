@@ -1,18 +1,30 @@
 defmodule ExVec do
   @moduledoc """
-  Documentation for `ExVec`.
+    ExVec is a tiny library illustrating how macros can be used provide
+    ergonomic access to the constructor pattern.
   """
 
   @doc """
-  Hello world.
+  vec! is a macro that takes an arbitrary number of arguments or a
+  stream and produces a dynamic array with fast random read/write access.
 
   ## Examples
+  defmodule MyApp do
+    # tbd: parallel yield sprinkles? async: true
+    use ExVec
 
-      iex> ExVec.hello()
-      :world
+    def print_to_64 do
+
+      for i <- vec!(0..64) do
+        IO.puts(i)
+      end
+    end
+  end
 
   """
-  def hello do
-    :world
+  defmacro vec!(arguments, do: expression) do
+    quote do
+      Array.new(arguments)
+    end
   end
 end

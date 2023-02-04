@@ -13,7 +13,7 @@ defmodule ExVec.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :array],
+      extra_applications: [:logger],
       mod: {ExVec.Application, []}
     ]
   end
