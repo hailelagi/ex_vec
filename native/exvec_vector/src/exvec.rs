@@ -23,11 +23,11 @@ pub fn new(fields: Vec<i32>) -> NifResult<(Atom, Vector)> {
 }
 
 #[rustler::nif]
-pub fn member(vec: Vec<i32>, n: i32) -> NifResult<(Atom, bool)> {
-    if vec.contains(&n) {
+pub fn member(vec: Vector, n: i32) -> NifResult<(Atom, bool)> {
+    if vec.fields.contains(&n) {
         Ok((atoms::ok(), true))
     } else {
-        Ok((atoms::error(), false))
+        Ok((atoms::ok(), false))
     }
 }
 

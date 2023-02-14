@@ -19,12 +19,14 @@ defmodule ExVec.Vector do
   defimpl Enumerable, for: ExVec.Vector do
     def count(%Vector{size: size} = _vec), do: {:ok, size}
     def count(list) when is_list(list), do: {:ok, Vector.new(list).size}
-    def member?(enum, key), do: Vector.member(enum, key)
+    def member?(%Vector{} = v, key), do: Vector.member(v, key)
 
+    # todo
     def reduce(_, _, _) do
       {:done, 0}
     end
 
+    # todo
     def slice(%Vector{size: size}) do
       {:ok, size, fn _, _ -> nil end}
     end
@@ -45,11 +47,13 @@ defmodule ExVec.Vector do
   end
 
   @impl Access
+  # todo
   def get_and_update(_data, _key, _function) do
     nil
   end
 
   @impl Access
+  # todo
   def pop(_data, _key) do
     nil
   end

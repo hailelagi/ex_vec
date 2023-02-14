@@ -11,9 +11,10 @@ defmodule ExVecTest do
   test "it checks for memebership" do
     {:ok, vec} = ExVec.Vector.new([42, 2, 3])
 
-    assert true == Enum.member?(vec.fields, 2)
-    assert false == Enum.member?(vec.fields, 8)
-    assert true == 42 in vec.fields
+    assert true == Enum.member?(vec, 2)
+    assert false == Enum.member?(vec, 8)
+
+    assert true == 42 in vec
   end
 
   test "it implements common access patterns" do
