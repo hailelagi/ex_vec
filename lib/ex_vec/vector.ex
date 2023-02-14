@@ -6,38 +6,39 @@ defmodule ExVec.Vector do
   """
   use Rustler, otp_app: :ex_vec, crate: "exvec_vector"
 
-  defstruct fields: %{}
+  alias ExVec.Vector
+
+  defstruct fields: nil, size: 0
+
   @behaviour Access
 
   def echo(_), do: error()
+  def new(_args), do: error()
 
-  def new(_args) do
-    []
-  end
-
-  defimpl Enumerable, for: ExVec.Array do
-    def count(_vec) do
-      0
+  defimpl Enumerable, for: ExVec.Vector do
+    def count(%Vector{} = _vec) do
+      # Vector.error()
+      {:ok, 0}
     end
 
     def member?(_, _) do
-      false
+      {:ok, false}
     end
 
     def reduce(_, _, _) do
-      nil
+      {:done, 0}
     end
 
-    def slice(_) do
-      nil
+    def slice(%Vector{size: size}) do
+      {:ok, size, fn _,_ -> nil end}
     end
   end
 
-  defimpl Collectable, for: ExVec.Array do
-    def into(_) do
-      nil
-    end
-  end
+  # defimpl Collectable, for: ExVec.Vector do
+  #   def into(_) do
+  #     nil
+  #   end
+  # end
 
   # todo: must define access via rust?
   # @impl Access
