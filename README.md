@@ -2,6 +2,21 @@
 
 re-creating rust's `vec!` macro in elixir
 
+## Example
+```elixir
+defmodule MyApp.DoStuff do
+  use ExVec, implementation: :rust
+
+  def len do
+    vec!(1, 2, 3, 4) |> Enum.count()
+  end
+
+  def map_by_2 do
+    vec!(1, 2, 3, 4) |> Enum.map(fn n -> n * 2 end)
+  end
+end
+```
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
