@@ -7,4 +7,8 @@ fn load(env: Env, _: Term) -> bool {
     true
 }
 
-rustler::init!("Elixir.ExVec.Vector", [exvec::echo], load = load);
+rustler::init!(
+    "Elixir.ExVec.Vector",
+    [exvec::new, exvec::member, exvec::get],
+    load = load
+);

@@ -12,25 +12,21 @@ defmodule ExVec.Vector do
 
   @behaviour Access
 
-  def echo(_), do: error()
   def new(_args), do: error()
+  def member(_, _), do: error()
+  def get(_, _), do: error()
 
   defimpl Enumerable, for: ExVec.Vector do
-    def count(%Vector{} = _vec) do
-      # Vector.error()
-      {:ok, 0}
-    end
-
-    def member?(_, _) do
-      {:ok, false}
-    end
+    def count(%Vector{size: size} = _vec), do: {:ok, size}
+    def count(list) when is_list(list), do: {:ok, Vector.new(list).size}
+    def member?(enum, key), do: Vector.member(enum, key)
 
     def reduce(_, _, _) do
       {:done, 0}
     end
 
     def slice(%Vector{size: size}) do
-      {:ok, size, fn _,_ -> nil end}
+      {:ok, size, fn _, _ -> nil end}
     end
   end
 
@@ -40,26 +36,23 @@ defmodule ExVec.Vector do
   #   end
   # end
 
-  # todo: must define access via rust?
-  # @impl Access
-  # def fetch(_term, _key) do
-  #   nil
-  # end
+  @impl Access
+  def fetch(%Vector{} = vec, key) do
+    case Vector.get(vec, key) do
+      {:ok, value} -> {:ok, value}
+      {:error, _} -> :error
+    end
+  end
 
-  # @impl Access
-  # def get_and_update(_data, _key, _function) do
-  #   nil
-  # end
+  @impl Access
+  def get_and_update(_data, _key, _function) do
+    nil
+  end
 
-  # @impl Access
-  # def pop(_data, _key) do
-  #   nil
-  # end
-
-  defdelegate fetch(term, key), to: Map
-  defdelegate get(term, key, default), to: Map
-  defdelegate get_and_update(term, key, fun), to: Map
-  defdelegate pop(data, key), to: Map
+  @impl Access
+  def pop(_data, _key) do
+    nil
+  end
 
   def error, do: :erlang.nif_error(:nif_not_loaded)
 end
