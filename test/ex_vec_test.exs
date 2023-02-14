@@ -3,6 +3,8 @@ defmodule ExVecTest do
   doctest ExVec
 
   test "greets the world" do
-    assert ExVec.hello() == :world
+    result = %ExVec.Vector{fields: [42]}
+
+    assert {:ok, result} == ExVec.Vector.echo(42)
   end
 end
