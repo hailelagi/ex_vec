@@ -5,15 +5,67 @@ defmodule ExVec.Array do
     tree of tupled elements
   """
 
-  @derive Access
+  @behaviour Access
+  alias ExVec.Array
+
+  @type t :: %__MODULE__{
+          fields: list(),
+          size: pos_integer()
+        }
+
+  defstruct fields: nil, size: 0
 
   def new(args) do
-    # todo: unpack stream support?
-    :array.new(args)
+    new = :array.new()
+
+    {size, fields} =
+      Enum.reduce(args, {0, new}, fn n, {i, acc} ->
+        {i + 1, :array.set(i, n, acc)}
+      end)
+
+    %__MODULE__{
+      fields: fields,
+      size: size
+    }
   end
 
-  defdelegate fetch(term, key), to: List
-  defdelegate get(term, key, default), to: List
-  defdelegate get_and_update(term, key, fun), to: List
-  defdelegate pop(data, key), to: Tuple
+  defimpl Enumerable, for: ExVec.Array do
+    def count(%Array{fields: fields} = _vec), do: {:ok, :array.size(fields)}
+
+    def member?(%Array{fields: fields}, key) do
+      ord = :array.sparse_to_orddict(fields)
+      membership = Enum.any?(ord, fn {_i, value} -> value == key end)
+
+      {:ok, membership}
+    end
+
+    def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
+    def reduce(vec, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(vec.fields, &1, fun)}
+    def reduce([], {:cont, acc}, _fun), do: {:done, acc}
+
+    def reduce(%Array{fields: fields}, {:cont, acc}, fun) do
+      :array.foldl(fn _index, val, acc -> fun.(val, acc) end, acc, fields)
+    end
+
+    def slice(%Array{}), do: {:error, __MODULE__}
+  end
+
+  @impl Access
+  def fetch(%Array{fields: fields, size: size}, index) do
+    cond do
+      index > 0 and index <= size -> {:ok, :array.get(index, fields)}
+      index < 0 -> :error
+      true -> :error
+    end
+  end
+
+  @impl Access
+  def get_and_update(_data, _key, _function) do
+    nil
+  end
+
+  @impl Access
+  def pop(_data, _key) do
+    nil
+  end
 end

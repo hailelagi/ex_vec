@@ -12,14 +12,13 @@ pub struct Vector {
 }
 
 #[rustler::nif]
-pub fn new(fields: Vec<i32>) -> NifResult<(Atom, Vector)> {
+pub fn new(fields: Vec<i32>) -> NifResult<Vector> {
     let size = fields.len();
-    let result = Vector {
+
+    Ok(Vector {
         fields: fields,
         size: size,
-    };
-
-    Ok((atoms::ok(), result))
+    })
 }
 
 #[rustler::nif]
@@ -35,6 +34,14 @@ pub fn member(vec: Vector, n: i32) -> NifResult<(Atom, bool)> {
 pub fn get(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
     match vec.fields.get(index) {
         Some(value) => Ok((atoms::ok(), *value as i32)),
-        None => Ok((atoms::error(), -1))
+        None => Ok((atoms::error(), -1)),
+    }
+}
+
+#[rustler::nif]
+pub fn slice(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
+    match vec.fields.get(index) {
+        Some(value) => Ok((atoms::ok(), *value as i32)),
+        None => Ok((atoms::error(), -1)),
     }
 }

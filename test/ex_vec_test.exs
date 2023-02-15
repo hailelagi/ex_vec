@@ -2,25 +2,42 @@ defmodule ExVecTest do
   use ExUnit.Case
   doctest ExVec
 
+  setup do
+    %{
+      vec: ExVec.Vector.new([42, 2, 3]),
+      array: ExVec.Array.new([42, 2, 3])
+    }
+  end
+
   test "it makes a new vector wrapper" do
-    result = %ExVec.Vector{fields: [42, 2, 3], size: 3}
+    vec_result = %ExVec.Vector{fields: [42, 2, 3], size: 3}
+    assert vec_result == ExVec.Vector.new([42, 2, 3])
 
-    assert {:ok, result} == ExVec.Vector.new([42, 2, 3])
+    array_result = ExVec.Array.new([42, 2, 3])
+    assert :array.to_list(array_result.fields) == [42, 2, 3]
+    assert array_result.size == 3
   end
 
-  test "it checks for memebership" do
-    {:ok, vec} = ExVec.Vector.new([42, 2, 3])
+  test "it checks for membership", ctx do
+    assert true == Enum.member?(ctx.vec, 2)
+    assert false == Enum.member?(ctx.vec, 8)
+    assert true == 42 in ctx.vec
 
-    assert true == Enum.member?(vec, 2)
-    assert false == Enum.member?(vec, 8)
-
-    assert true == 42 in vec
+    assert true == Enum.member?(ctx.array, 2)
+    assert false == Enum.member?(ctx.array, 8)
+    assert true == 42 in ctx.array
   end
 
-  test "it implements common access patterns" do
-    {:ok, vec} = ExVec.Vector.new([42, 2, 3])
+  test "it implements common access patterns", ctx do
+    assert ctx.vec[0] == 42
+    assert ctx.vec[7] == nil
 
-    assert vec[0] == 42
-    assert vec[7] == nil
+    assert ctx.array[0] == 42
+    assert ctx.array[7] == nil
+  end
+
+  test "it implements the 'reduce' pattern", ctx do
+    assert [84, 4, 6] == Enum.map(ctx.vec, fn n -> n * 2 end)
+    assert [84, 4, 6] == Enum.map(ctx.array, fn n -> n * 2 end)
   end
 end

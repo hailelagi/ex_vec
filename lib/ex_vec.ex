@@ -20,9 +20,19 @@ defmodule ExVec do
     end
   end
   """
-  defmacro vec!(arguments, do: expression) do
+  defmacro __using__(_options) do
     quote do
-      Array.new(arguments)
+      import unquote(__MODULE__)
+    end
+  end
+
+  defmacro vec!({_node, _, args}) do
+    quote do
+      case implementation do
+        :rust -> Vector.new(unquote(args))
+        :erlang -> Array.new(unquote(args))
+        _ -> raise "invalid"
+      end
     end
   end
 end

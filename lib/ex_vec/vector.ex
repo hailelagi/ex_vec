@@ -8,6 +8,11 @@ defmodule ExVec.Vector do
 
   alias ExVec.Vector
 
+  @type t :: %__MODULE__{
+          fields: list(),
+          size: pos_integer()
+        }
+
   defstruct fields: nil, size: 0
 
   @behaviour Access
@@ -15,28 +20,24 @@ defmodule ExVec.Vector do
   def new(_args), do: error()
   def member(_, _), do: error()
   def get(_, _), do: error()
+  def slice(_, _), do: error()
 
   defimpl Enumerable, for: ExVec.Vector do
     def count(%Vector{size: size} = _vec), do: {:ok, size}
-    def count(list) when is_list(list), do: {:ok, Vector.new(list).size}
+
     def member?(%Vector{} = v, key), do: Vector.member(v, key)
 
-    # todo
-    def reduce(_, _, _) do
-      {:done, 0}
+    def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
+    def reduce(vec, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(vec.fields, &1, fun)}
+    def reduce([], {:cont, acc}, _fun), do: {:done, acc}
+    def reduce([head | tail], {:cont, acc}, fun), do: reduce(tail, fun.(head, acc), fun)
+
+    def reduce(%Vector{fields: [head | tail]}, {:cont, acc}, fun) do
+      reduce(tail, fun.(head, acc), fun)
     end
 
-    # todo
-    def slice(%Vector{size: size}) do
-      {:ok, size, fn _, _ -> nil end}
-    end
+    def slice(%Vector{}), do: {:error, __MODULE__}
   end
-
-  # defimpl Collectable, for: ExVec.Vector do
-  #   def into(_) do
-  #     nil
-  #   end
-  # end
 
   @impl Access
   def fetch(%Vector{} = vec, key) do
@@ -47,7 +48,7 @@ defmodule ExVec.Vector do
   end
 
   @impl Access
-  # todo
+
   def get_and_update(_data, _key, _function) do
     nil
   end
