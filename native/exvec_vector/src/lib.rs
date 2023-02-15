@@ -9,6 +9,13 @@ fn load(env: Env, _: Term) -> bool {
 
 rustler::init!(
     "Elixir.ExVec.Vector",
-    [exvec::init, exvec::member, exvec::get, exvec::slice],
+    [
+        exvec::init,
+        exvec::member,
+        exvec::get,
+        exvec::slice,
+        exvec::get_and_update,
+        exvec::pop
+    ],
     load = load
 );

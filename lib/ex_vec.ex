@@ -19,6 +19,8 @@ defmodule ExVec do
       end
     end
   end
+
+  MyApp.print_to_64()
   """
   defmacro __using__(_options) do
     quote do

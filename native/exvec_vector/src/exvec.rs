@@ -45,3 +45,19 @@ pub fn slice(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
         None => Ok((atoms::error(), -1)),
     }
 }
+
+#[rustler::nif]
+pub fn get_and_update(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
+    match vec.fields.get(index) {
+        Some(value) => Ok((atoms::ok(), *value as i32)),
+        None => Ok((atoms::error(), -1)),
+    }
+}
+
+#[rustler::nif]
+pub fn pop(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
+    match vec.fields.get(index) {
+        Some(value) => Ok((atoms::ok(), *value as i32)),
+        None => Ok((atoms::error(), -1)),
+    }
+}
