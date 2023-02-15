@@ -17,7 +17,12 @@ defmodule ExVec.Vector do
 
   @behaviour Access
 
-  def new(_args), do: error()
+  def new(args) when is_struct(args), do: init(Enum.to_list(args))
+  def new(args) when is_list(args), do: init(args)
+  def new(_args), do: :error
+
+  # Natively Implemented in Rust
+  def init(_args), do: error()
   def member(_, _), do: error()
   def get(_, _), do: error()
   def slice(_, _), do: error()

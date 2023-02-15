@@ -12,7 +12,7 @@ pub struct Vector {
 }
 
 #[rustler::nif]
-pub fn new(fields: Vec<i32>) -> NifResult<Vector> {
+pub fn init(fields: Vec<i32>) -> NifResult<Vector> {
     let size = fields.len();
 
     Ok(Vector {
