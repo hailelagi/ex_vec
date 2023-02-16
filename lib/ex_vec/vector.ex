@@ -1,8 +1,6 @@
 defmodule ExVec.Vector do
   @moduledoc """
     elixir wrapper for std::vec::Vec<T, A>
-    stores values in a custom key-value map, where:
-    keys are indices starting from 0 and values are passed to new/1
   """
   use Rustler, otp_app: :ex_vec, crate: "exvec_vector"
 
@@ -25,7 +23,7 @@ defmodule ExVec.Vector do
   def init(_args), do: error()
   def member(_, _), do: error()
   def get(_, _), do: error()
-  def slice(_, _), do: error()
+  def slice(_), do: error()
   def update(_data, _key, _function), do: error()
   def delete(_data, _key), do: error()
 
@@ -44,10 +42,6 @@ defmodule ExVec.Vector do
     def reduce(%Vector{fields: [head | tail]}, {:cont, acc}, fun) do
       reduce(tail, fun.(head, acc), fun)
     end
-
-    def slice(%Vector{}) do
-      nil
-    end
   end
 
   @impl Access
@@ -59,17 +53,34 @@ defmodule ExVec.Vector do
   end
 
   @impl Access
-  def get_and_update(vec, key, function) do
-    nil
+  def get_and_update(%Vector{} = vec, key, fun) when is_function(fun) do
+    current = nillable_get(vec, key)
+
+    case fun.(current) do
+      {get, update} ->
+        {get, Vector.update(vec, key, update)}
+
+      :pop -> pop(vec, key)
+
+      other ->
+        raise "the given function must return a two-element tuple or :pop, got: #{inspect(other)}"
+    end
   end
 
   @impl Access
-
   def pop(%Vector{} = vec, key) do
     case Vector.delete(vec, key) do
-      {:ok, value} -> {:ok, value}
-      {:error, _} -> :error
+      {:ok, {_prev, _new} = result} -> result
+      {:error, _} -> {nil, vec}
     end
   end
+
+  defp nillable_get(vec, key) do
+    case Vector.get(vec, key) do
+      {:ok, value} -> value
+      {:error, _} -> nil
+    end
+  end
+
   def error, do: :erlang.nif_error(:nif_not_loaded)
 end

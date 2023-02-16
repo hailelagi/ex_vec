@@ -13,9 +13,8 @@ rustler::init!(
         exvec::init,
         exvec::member,
         exvec::get,
-        exvec::slice,
-        exvec::get_and_update,
-        exvec::pop
+        exvec::update,
+        exvec::delete
     ],
     load = load
 );

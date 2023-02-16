@@ -1,7 +1,7 @@
 use rustler::{Atom, NifResult, NifStruct};
 
 mod atoms {
-    rustler::atoms! {ok, error, not_found}
+    rustler::atoms! {ok, error, not_found, nil}
 }
 
 #[derive(Debug, NifStruct)]
@@ -38,26 +38,45 @@ pub fn get(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
     }
 }
 
+// #[rustler::nif]
+// pub fn slice(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
+//     match vec.fields.get(index) {
+//         Some(value) => Ok((atoms::ok(), *value as i32)),
+//         None => Ok((atoms::error(), -1)),
+//     }
+// }
+
 #[rustler::nif]
-pub fn slice(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
+pub fn update(vec: Vector, index: usize, value: i32) -> NifResult<Vector> {
+    let mut vec = Vector {
+        fields: vec.fields,
+        size: vec.size,
+    };
+
     match vec.fields.get(index) {
-        Some(value) => Ok((atoms::ok(), *value as i32)),
-        None => Ok((atoms::error(), -1)),
+        Some(_) => {
+            vec.fields[index] = value;
+
+            Ok(vec)
+        }
+        None => Ok(vec),
     }
 }
 
 #[rustler::nif]
-pub fn get_and_update(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
-    match vec.fields.get(index) {
-        Some(value) => Ok((atoms::ok(), *value as i32)),
-        None => Ok((atoms::error(), -1)),
-    }
-}
+pub fn delete(vec: Vector, index: usize) -> NifResult<(Atom, (i32, Vector))> {
+    let mut vec = Vector {
+        fields: vec.fields,
+        size: vec.size,
+    };
 
-#[rustler::nif]
-pub fn pop(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
     match vec.fields.get(index) {
-        Some(value) => Ok((atoms::ok(), *value as i32)),
-        None => Ok((atoms::error(), -1)),
+        Some(_) => {
+            let popped = vec.fields.remove(index);
+            vec.size = vec.size - 1;
+
+            Ok((atoms::ok(), (popped, vec)))
+        }
+        None => Ok((atoms::error(), (-1, vec))),
     }
 }
