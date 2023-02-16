@@ -43,6 +43,6 @@ defmodule ExVecTest do
 
   test "it implements the 'reduce' pattern", ctx do
     assert [84, 4, 6] == Enum.map(ctx.vec, fn n -> n * 2 end)
-    # assert [84, 4, 6] == Enum.map(ctx.array, fn n -> n * 2 end)
+    assert [84, 4, 6] == Enum.map(ctx.array, fn n -> n * 2 end)
   end
 end

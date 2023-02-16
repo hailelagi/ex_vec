@@ -46,8 +46,6 @@ defmodule ExVec.Array do
     def reduce(%Array{fields: fields}, {:cont, acc}, fun) do
       :array.foldl(fn _index, val, acc -> fun.(val, acc) end, acc, fields)
     end
-
-    def slice(%Array{}), do: {:error, __MODULE__}
   end
 
   @impl Access
@@ -57,15 +55,5 @@ defmodule ExVec.Array do
       index < 0 -> :error
       true -> :error
     end
-  end
-
-  @impl Access
-  def get_and_update(_data, _key, _function) do
-    nil
-  end
-
-  @impl Access
-  def pop(_data, _key) do
-    nil
   end
 end
