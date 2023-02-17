@@ -39,12 +39,20 @@ defmodule ExVec.Array do
       {:ok, membership}
     end
 
-    def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
-    def reduce(vec, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(vec.fields, &1, fun)}
-    def reduce([], {:cont, acc}, _fun), do: {:done, acc}
+    def slice(%Array{}) do
+      {:error, ExVec.Array}
+    end
 
+    def reduce(_list, {:halt, acc}, _fun), do: {:halted, acc}
+    def reduce(array, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(array.fields, &1, fun)}
+    def reduce([], {:cont, acc}, _fun), do: {:done, acc}
+    def reduce([head | tail], {:cont, acc}, fun), do: reduce(tail, fun.(head, acc), fun)
+
+    # even more cheating, should actually use :array.foldl here but oh well.
     def reduce(%Array{fields: fields}, {:cont, acc}, fun) do
-      :array.foldl(fn _index, val, acc -> fun.(val, acc) end, acc, fields)
+      [head | tail] = :array.to_list(fields)
+
+      reduce(tail, fun.(head, acc), fun)
     end
   end
 
@@ -55,5 +63,15 @@ defmodule ExVec.Array do
       index < 0 -> :error
       true -> :error
     end
+  end
+
+  @impl Access
+  def get_and_update(_, _, _) do
+    {:error, ExVec.Array}
+  end
+
+  @impl Access
+  def pop(_, _) do
+    {:error, ExVec.Array}
   end
 end

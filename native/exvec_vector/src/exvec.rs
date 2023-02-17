@@ -38,14 +38,6 @@ pub fn get(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
     }
 }
 
-// #[rustler::nif]
-// pub fn slice(vec: Vector, index: usize) -> NifResult<(Atom, i32)> {
-//     match vec.fields.get(index) {
-//         Some(value) => Ok((atoms::ok(), *value as i32)),
-//         None => Ok((atoms::error(), -1)),
-//     }
-// }
-
 #[rustler::nif]
 pub fn update(vec: Vector, index: usize, value: i32) -> NifResult<Vector> {
     let mut vec = Vector {

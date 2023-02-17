@@ -42,6 +42,10 @@ defmodule ExVec.Vector do
     def reduce(%Vector{fields: [head | tail]}, {:cont, acc}, fun) do
       reduce(tail, fun.(head, acc), fun)
     end
+
+    def slice(%Vector{}) do
+      {:error, ExVec.Vector}
+    end
   end
 
   @impl Access
@@ -60,7 +64,8 @@ defmodule ExVec.Vector do
       {get, update} ->
         {get, Vector.update(vec, key, update)}
 
-      :pop -> pop(vec, key)
+      :pop ->
+        pop(vec, key)
 
       other ->
         raise "the given function must return a two-element tuple or :pop, got: #{inspect(other)}"
