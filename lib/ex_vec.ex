@@ -22,19 +22,33 @@ defmodule ExVec do
 
   MyApp.print_to_64()
   """
-  defmacro __using__(_options) do
+
+  defmacro __using__(implementation: impl) do
     quote do
       import unquote(__MODULE__)
+      Module.put_attribute(__MODULE__, :implementation, unquote(impl))
     end
   end
 
-  defmacro vec!({_node, _, args}) do
-    quote do
-      case implementation do
-        :rust -> Vector.new(unquote(args))
-        :erlang -> Array.new(unquote(args))
-        _ -> raise "invalid"
-      end
+  defmacro vec!([_h | _t] = args) do
+    quote bind_quoted: [args: args] do
+      dispatch_constructor(@implementation, args)
+    end
+  end
+
+  defmacro vec!({:.., _, [first, last]}) do
+    args = Range.new(first, last) |> Enum.to_list()
+
+    quote bind_quoted: [args: args] do
+      dispatch_constructor(@implementation, args)
+    end
+  end
+
+  def dispatch_constructor(impl, args) do
+    case impl do
+      :rust -> Vector.new(args)
+      :erlang -> Array.new(args)
+      _ -> raise "invalid constructor type, did you mean :rust?"
     end
   end
 end
