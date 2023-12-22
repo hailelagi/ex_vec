@@ -1,6 +1,6 @@
 # ExVec
 
-re-creating rust's `vec!` macro in elixir, [read about it here!](www.hailelagi.com/writing/legos/)
+re-creating rust's `vec!` macro in elixir, [read about it here!](https://www.hailelagi.com/writing/legos/)
 
 ## Example
 ```elixir
